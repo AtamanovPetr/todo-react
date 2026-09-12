@@ -1,0 +1,332 @@
+/* ===== Сброс ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-1: #0a0018;
+  --bg-2: #1a0b2e;
+  --bg-3: #2d1b4e;
+  --neon-pink: #ff2a6d;
+  --neon-cyan: #05d9e8;
+  --neon-purple: #d300c5;
+  --neon-lime: #b8ff3a;
+  --text: #f0e8ff;
+  --text-dim: #a893c7;
+  --glass: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 42, 109, 0.35);
+  --radius: 14px;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(211, 0, 197, 0.35),
+      transparent 45%
+    ),
+    radial-gradient(circle at 85% 80%, rgba(5, 217, 232, 0.3), transparent 45%),
+    linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+/* ===== Контейнер приложения ===== */
+.app {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 60px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===== Заголовок ===== */
+.app-title {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 20px rgba(255, 42, 109, 0.5));
+}
+
+/* ===== Строка ввода ===== */
+.input-row {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+@media (max-width: 520px) {
+  .input-row {
+    flex-direction: column;
+  }
+}
+
+.todo-input {
+  flex: 1;
+  padding: 16px 22px;
+  font-size: 1.05rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--glass);
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius);
+  outline: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    inset 0 0 20px rgba(255, 42, 109, 0.08),
+    0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.todo-input::placeholder {
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+.todo-input:focus {
+  border-color: var(--neon-cyan);
+  box-shadow:
+    0 0 0 3px rgba(5, 217, 232, 0.2),
+    0 0 30px rgba(5, 217, 232, 0.4),
+    inset 0 0 20px rgba(5, 217, 232, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ===== Общие стили кнопок ===== */
+.add-btn,
+.clear-btn {
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius);
+  padding: 14px 28px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+  box-shadow:
+    0 0 20px rgba(255, 42, 109, 0.4),
+    0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.add-btn::before,
+.clear-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.add-btn:hover,
+.clear-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    0 0 35px rgba(255, 42, 109, 0.7),
+    0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.add-btn:hover::before,
+.clear-btn:hover::before {
+  left: 100%;
+}
+
+.add-btn:active,
+.clear-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ===== Кнопка "Очистить всё" — отдельный стиль ===== */
+.clear-btn {
+  background: linear-gradient(135deg, #2d1b4e, #1a0b2e);
+  border: 1.5px solid var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 20px rgba(5, 217, 232, 0.3);
+}
+
+.clear-btn:hover {
+  background: var(--neon-cyan);
+  color: #0a0018;
+  box-shadow:
+    0 0 30px rgba(5, 217, 232, 0.8),
+    0 0 60px rgba(5, 217, 232, 0.4);
+}
+
+/* ===== Список задач ===== */
+.todo-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  font-size: 1.05rem;
+  background: var(--glass);
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  cursor: pointer;
+  word-break: break-word;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 0 15px rgba(211, 0, 197, 0.05);
+  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.todo-item:hover {
+  transform: translateX(6px);
+  border-color: var(--neon-cyan);
+  box-shadow:
+    0 6px 30px rgba(5, 217, 232, 0.35),
+    inset 0 0 20px rgba(5, 217, 232, 0.08);
+}
+
+.todo-item.completed {
+  color: var(--text-dim);
+  background: rgba(184, 255, 58, 0.05);
+  border-color: rgba(184, 255, 58, 0.4);
+  opacity: 0.75;
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+  text-decoration-color: var(--neon-pink);
+  text-decoration-thickness: 2px;
+}
+
+.todo-item.completed:hover {
+  border-color: var(--neon-lime);
+  box-shadow:
+    0 6px 30px rgba(184, 255, 58, 0.35),
+    inset 0 0 20px rgba(184, 255, 58, 0.1);
+}
+
+.todo-text {
+  flex: 1;
+}
+
+/* ===== Кнопка удаления ===== */
+.delete-btn {
+  padding: 6px 14px;
+  font-size: 1.1rem;
+  font-weight: 900;
+  background: transparent;
+  color: var(--neon-pink);
+  border: 1.5px solid var(--neon-pink);
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(255, 42, 109, 0.3);
+  cursor: pointer;
+  min-width: 40px;
+  flex-shrink: 0;
+  margin-left: 12px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: inherit;
+}
+
+.delete-btn:hover {
+  background: var(--neon-pink);
+  color: #fff;
+  box-shadow:
+    0 0 25px rgba(255, 42, 109, 0.9),
+    0 0 50px rgba(255, 42, 109, 0.5);
+  transform: scale(1.1) rotate(-5deg);
+}
+
+/* ===== Счётчик ===== */
+.counter {
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 12px;
+  border-top: 1px dashed rgba(255, 42, 109, 0.3);
+  border-bottom: 1px dashed rgba(5, 217, 232, 0.3);
+}
+
+/* ===== Анимация появления ===== */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== Скроллбар ===== */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--neon-pink), var(--neon-purple));
+  border-radius: 10px;
+  border: 2px solid var(--bg-1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(var(--neon-cyan), var(--neon-purple));
+}
+
+/* ===== Адаптив ===== */
+@media (max-width: 520px) {
+  .app {
+    padding: 40px 16px;
+  }
+
+  .app-title {
+    font-size: 1.7rem;
+  }
+
+  .todo-item {
+    padding: 14px 16px;
+    font-size: 1rem;
+  }
+
+  .add-btn,
+  .clear-btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+  }
+}
