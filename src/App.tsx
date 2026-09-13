@@ -5,8 +5,8 @@ function App() {
   const [text, setText] = useState<string>("");
   const [items, setItems] = useState<
     {
-      id: number;
       text: string;
+      id: number;
       completed: boolean;
     }[]
   >(() => {
@@ -20,7 +20,7 @@ function App() {
     localStorage.setItem("todos", JSON.stringify(items));
   }, [items]);
 
-  const remaining = items.filter((t) => !t.completed).length;
+  const remaining = items.filter((item) => item.completed !== true).length;
 
   return (
     <div className="app">
@@ -36,13 +36,16 @@ function App() {
         <button
           className="add-btn"
           onClick={() => {
-            if (text.trim().length === 0) return;
+            if (text.trim().length === 0) {
+              setText("");
+              return;
+            }
             setItems([
               ...items,
               { text: text, id: nextId.current, completed: false },
             ]);
-            setText("");
             nextId.current = nextId.current + 1;
+            setText("");
           }}
         >
           Добавить
@@ -56,10 +59,8 @@ function App() {
             key={item.id}
             onClick={() =>
               setItems(
-                items.map((todo) =>
-                  todo.id === item.id
-                    ? { ...todo, completed: !todo.completed }
-                    : todo,
+                items.map((t) =>
+                  t.id === item.id ? { ...t, completed: !t.completed } : t,
                 ),
               )
             }
