@@ -331,3 +331,90 @@ body {
     font-size: 0.9rem;
   }
 }
+
+/* ===== Блок фильтров ===== */
+.filters {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+/* ===== Кнопка фильтра ===== */
+.filter-btn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  color: var(--text-dim);
+  background: var(--glass);
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.filter-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.filter-btn:hover {
+  color: var(--text);
+  border-color: var(--neon-cyan);
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(5, 217, 232, 0.3);
+}
+
+.filter-btn:hover::before {
+  left: 100%;
+}
+
+.filter-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ===== Активная кнопка фильтра ===== */
+.filter-btn.active {
+  color: #0a0018;
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-lime));
+  box-shadow:
+    0 0 20px rgba(5, 217, 232, 0.6),
+    0 0 40px rgba(184, 255, 58, 0.3);
+}
+
+.filter-btn.active:hover {
+  box-shadow:
+    0 0 30px rgba(5, 217, 232, 0.9),
+    0 0 60px rgba(184, 255, 58, 0.5);
+}
+
+/* ===== Адаптив ===== */
+@media (max-width: 520px) {
+  .filters {
+    gap: 8px;
+  }
+
+  .filter-btn {
+    padding: 8px 14px;
+    font-size: 0.75rem;
+  }
+}

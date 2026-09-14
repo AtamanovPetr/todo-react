@@ -1,19 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
-
+import type { Todo, Filter } from "./types";
+import TodoList from "./components/TodoList";
+import TodoForm from "./components/TodoForm";
+import FilterButtons from "./components/FilterButtons";
 function App() {
-  const [text, setText] = useState<string>("");
-  const [items, setItems] = useState<
-    {
-      text: string;
-      id: number;
-      completed: boolean;
-    }[]
-  >(() => {
+  const [items, setItems] = useState<Todo[]>(() => {
     const saved = localStorage.getItem("todos");
     return saved ? JSON.parse(saved) : [];
   });
-
+  const [filter, setFilter] = useState<Filter>("all");
   const nextId = useRef(Math.max(...items.map((t) => t.id), 0) + 1);
 
   useEffect(() => {
@@ -22,62 +18,41 @@ function App() {
 
   const remaining = items.filter((item) => item.completed !== true).length;
 
+  function handleToggle(id: number) {
+    setItems(
+      items.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)),
+    );
+  }
+
+  function handleDelete(id: number) {
+    setItems(items.filter((t) => t.id !== id));
+  }
+
+  function handleAdd(text: string) {
+    if (text.trim().length === 0) {
+      return;
+    }
+    setItems([...items, { text: text, id: nextId.current, completed: false }]);
+    nextId.current = nextId.current + 1;
+  }
+  const visibleItems = items.filter((item) => {
+    if (filter === "active") return !item.completed;
+    if (filter === "completed") return item.completed;
+    return true;
+  });
   return (
     <div className="app">
       <h1 className="app-title">Список задач</h1>
 
-      <div className="input-row">
-        <input
-          className="todo-input"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Что нужно сделать?"
-        />
-        <button
-          className="add-btn"
-          onClick={() => {
-            if (text.trim().length === 0) {
-              setText("");
-              return;
-            }
-            setItems([
-              ...items,
-              { text: text, id: nextId.current, completed: false },
-            ]);
-            nextId.current = nextId.current + 1;
-            setText("");
-          }}
-        >
-          Добавить
-        </button>
-      </div>
+      <TodoForm onAdd={handleAdd} />
 
-      <ul className="todo-list">
-        {items.map((item) => (
-          <li
-            className={item.completed ? "todo-item completed" : "todo-item"}
-            key={item.id}
-            onClick={() =>
-              setItems(
-                items.map((t) =>
-                  t.id === item.id ? { ...t, completed: !t.completed } : t,
-                ),
-              )
-            }
-          >
-            <span className="todo-text">{item.text}</span>
-            <button
-              className="delete-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                setItems(items.filter((todo) => todo.id !== item.id));
-              }}
-            >
-              ×
-            </button>
-          </li>
-        ))}
-      </ul>
+      <TodoList
+        onDelete={handleDelete}
+        onToggle={handleToggle}
+        items={visibleItems}
+      />
+
+      <FilterButtons onChange={setFilter} filter={filter} />
 
       <p className="counter">Осталось: {remaining}</p>
 
