@@ -4,42 +4,51 @@ import type { Todo, Filter } from "./types";
 import TodoList from "./components/TodoList";
 import TodoForm from "./components/TodoForm";
 import FilterButtons from "./components/FilterButtons";
+
 function App() {
   const [items, setItems] = useState<Todo[]>(() => {
     const saved = localStorage.getItem("todos");
     return saved ? JSON.parse(saved) : [];
   });
+
   const [filter, setFilter] = useState<Filter>("all");
-  const nextId = useRef(Math.max(...items.map((t) => t.id), 0) + 1);
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(items));
   }, [items]);
 
-  const remaining = items.filter((item) => item.completed !== true).length;
+  const nextId = useRef(Math.max(...items.map((t) => t.id), 0) + 1);
 
-  function handleToggle(id: number) {
-    setItems(
-      items.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)),
-    );
+  function handleAdd(text: string) {
+    setItems([...items, { text, id: nextId.current, completed: false }]);
+    nextId.current = nextId.current + 1;
   }
 
   function handleDelete(id: number) {
-    setItems(items.filter((t) => t.id !== id));
+    setItems(items.filter((todo) => todo.id !== id));
   }
 
-  function handleAdd(text: string) {
-    if (text.trim().length === 0) {
-      return;
-    }
-    setItems([...items, { text: text, id: nextId.current, completed: false }]);
-    nextId.current = nextId.current + 1;
+  function handleToggle(id: number) {
+    setItems(
+      items.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+      ),
+    );
   }
-  const visibleItems = items.filter((item) => {
-    if (filter === "active") return !item.completed;
-    if (filter === "completed") return item.completed;
-    return true;
+
+  function handleClear() {
+    setItems([]);
+  }
+
+  const visibleItems = items.filter((todo) => {
+    if (filter === "all") return true;
+    if (filter === "active") return !todo.completed;
+    if (filter === "completed") return todo.completed;
+    return false;
   });
+
+  const remaining = items.filter((todo) => !todo.completed).length;
+
   return (
     <div className="app">
       <h1 className="app-title">Список задач</h1>
@@ -47,16 +56,16 @@ function App() {
       <TodoForm onAdd={handleAdd} />
 
       <TodoList
-        onDelete={handleDelete}
-        onToggle={handleToggle}
         items={visibleItems}
+        onToggle={handleToggle}
+        onDelete={handleDelete}
       />
 
-      <FilterButtons onChange={setFilter} filter={filter} />
+      <FilterButtons filter={filter} onChange={setFilter} />
 
       <p className="counter">Осталось: {remaining}</p>
 
-      <button className="clear-btn" onClick={() => setItems([])}>
+      <button className="clear-btn" onClick={handleClear}>
         Очистить всё
       </button>
     </div>

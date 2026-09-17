@@ -1,9 +1,12 @@
 import { useState } from "react";
+
 export interface TodoFormProps {
   onAdd: (text: string) => void;
 }
+
 export default function TodoForm({ onAdd }: TodoFormProps) {
   const [text, setText] = useState<string>("");
+
   function handleClick() {
     if (text.trim().length === 0) {
       setText("");
@@ -12,6 +15,7 @@ export default function TodoForm({ onAdd }: TodoFormProps) {
     onAdd(text);
     setText("");
   }
+
   return (
     <div className="input-row">
       <input

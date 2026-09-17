@@ -1,10 +1,12 @@
-import TodoItem from "./TodoItem";
 import type { Todo } from "../types";
+import TodoItem from "./TodoItem";
+
 export interface TodoListProps {
   items: Todo[];
   onToggle: (id: number) => void;
   onDelete: (id: number) => void;
 }
+
 export default function TodoList({ items, onToggle, onDelete }: TodoListProps) {
   return (
     <ul className="todo-list">
@@ -12,8 +14,8 @@ export default function TodoList({ items, onToggle, onDelete }: TodoListProps) {
         <TodoItem
           key={todo.id}
           item={todo}
-          onDelete={onDelete}
           onToggle={onToggle}
+          onDelete={onDelete}
         />
       ))}
     </ul>
