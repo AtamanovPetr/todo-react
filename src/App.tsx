@@ -1,12 +1,36 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useReducer } from "react";
 import "./App.css";
-import type { Todo, Filter } from "./types";
+import type { Todo, Filter, Action } from "./types";
 import TodoList from "./components/TodoList";
 import TodoForm from "./components/TodoForm";
 import FilterButtons from "./components/FilterButtons";
-
+function reducer(state: Todo[], action: Action): Todo[] {
+  switch (action.type) {
+    case "add":
+      return [
+        ...state,
+        {
+          text: action.payload,
+          id: Math.max(...state.map((t) => t.id), 0) + 1,
+          completed: false,
+        },
+      ];
+    case "delete":
+      return state.filter((todo) => todo.id !== action.payload);
+    case "toggle":
+      return state.map((todo) => {
+        return todo.id === action.payload
+          ? { ...todo, completed: !todo.completed }
+          : todo;
+      });
+    case "clear":
+      return [];
+    default:
+      return state;
+  }
+}
 function App() {
-  const [items, setItems] = useState<Todo[]>(() => {
+  const [items, dispatch] = useReducer(reducer, undefined, () => {
     const saved = localStorage.getItem("todos");
     return saved ? JSON.parse(saved) : [];
   });
@@ -17,28 +41,7 @@ function App() {
     localStorage.setItem("todos", JSON.stringify(items));
   }, [items]);
 
-  const nextId = useRef(Math.max(...items.map((t) => t.id), 0) + 1);
-
-  function handleAdd(text: string) {
-    setItems([...items, { text, id: nextId.current, completed: false }]);
-    nextId.current = nextId.current + 1;
-  }
-
-  function handleDelete(id: number) {
-    setItems(items.filter((todo) => todo.id !== id));
-  }
-
-  function handleToggle(id: number) {
-    setItems(
-      items.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
-      ),
-    );
-  }
-
-  function handleClear() {
-    setItems([]);
-  }
+  const remaining = items.filter((todo) => !todo.completed).length;
 
   const visibleItems = items.filter((todo) => {
     if (filter === "all") return true;
@@ -46,8 +49,20 @@ function App() {
     if (filter === "completed") return todo.completed;
     return false;
   });
+  function handleAdd(text: string) {
+    dispatch({ type: "add", payload: text });
+  }
+  function handleToggle(id: number) {
+    dispatch({ type: "toggle", payload: id });
+  }
 
-  const remaining = items.filter((todo) => !todo.completed).length;
+  function handleDelete(id: number) {
+    dispatch({ type: "delete", payload: id });
+  }
+
+  function handleClear() {
+    dispatch({ type: "clear" });
+  }
 
   return (
     <div className="app">
