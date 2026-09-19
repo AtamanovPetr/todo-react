@@ -4,6 +4,7 @@ import type { Todo, Filter, Action } from "./types";
 import TodoList from "./components/TodoList";
 import TodoForm from "./components/TodoForm";
 import FilterButtons from "./components/FilterButtons";
+import { ThemeContext, type Theme } from "./theme-context";
 function reducer(state: Todo[], action: Action): Todo[] {
   switch (action.type) {
     case "add":
@@ -15,14 +16,14 @@ function reducer(state: Todo[], action: Action): Todo[] {
           completed: false,
         },
       ];
-    case "delete":
-      return state.filter((todo) => todo.id !== action.payload);
     case "toggle":
       return state.map((todo) => {
         return todo.id === action.payload
           ? { ...todo, completed: !todo.completed }
           : todo;
       });
+    case "delete":
+      return state.filter((todo) => todo.id !== action.payload);
     case "clear":
       return [];
     default:
@@ -37,6 +38,8 @@ function App() {
 
   const [filter, setFilter] = useState<Filter>("all");
 
+  const [theme, setTheme] = useState<Theme>("light");
+
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(items));
   }, [items]);
@@ -49,41 +52,47 @@ function App() {
     if (filter === "completed") return todo.completed;
     return false;
   });
+
   function handleAdd(text: string) {
     dispatch({ type: "add", payload: text });
+  }
+  function handleDelete(id: number) {
+    dispatch({ type: "delete", payload: id });
   }
   function handleToggle(id: number) {
     dispatch({ type: "toggle", payload: id });
   }
-
-  function handleDelete(id: number) {
-    dispatch({ type: "delete", payload: id });
-  }
-
   function handleClear() {
     dispatch({ type: "clear" });
   }
-
   return (
-    <div className="app">
-      <h1 className="app-title">Список задач</h1>
+    <ThemeContext.Provider value={theme}>
+      <div className={theme === "light" ? "app" : "app dark"}>
+        <button
+          className="theme-btn"
+          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+        >
+          {theme === "light" ? "🌙 Тёмная" : "☀️ Светлая"}
+        </button>
+        <h1 className="app-title">Список задач</h1>
 
-      <TodoForm onAdd={handleAdd} />
+        <TodoForm onAdd={handleAdd} />
 
-      <TodoList
-        items={visibleItems}
-        onToggle={handleToggle}
-        onDelete={handleDelete}
-      />
+        <TodoList
+          items={visibleItems}
+          onToggle={handleToggle}
+          onDelete={handleDelete}
+        />
 
-      <FilterButtons filter={filter} onChange={setFilter} />
+        <FilterButtons filter={filter} onChange={setFilter} />
 
-      <p className="counter">Осталось: {remaining}</p>
+        <p className="counter">Осталось: {remaining}</p>
 
-      <button className="clear-btn" onClick={handleClear}>
-        Очистить всё
-      </button>
-    </div>
+        <button className="clear-btn" onClick={handleClear}>
+          Очистить всё
+        </button>
+      </div>
+    </ThemeContext.Provider>
   );
 }
 
