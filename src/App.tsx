@@ -4,6 +4,8 @@ import type { Todo, Filter, Action } from "./types";
 import TodoList from "./components/TodoList";
 import TodoForm from "./components/TodoForm";
 import FilterButtons from "./components/FilterButtons";
+import type { ThemeType } from "./theme.context";
+import { ThemeContext } from "./theme.context";
 function reducer(state: Todo[], action: Action): Todo[] {
   switch (action.type) {
     case "add":
@@ -34,7 +36,7 @@ function App() {
     const saved = localStorage.getItem("todos");
     return saved ? JSON.parse(saved) : [];
   });
-
+  const [theme, setTheme] = useState<ThemeType>("light");
   const [filter, setFilter] = useState<Filter>("all");
 
   useEffect(() => {
@@ -65,25 +67,30 @@ function App() {
   }
 
   return (
-    <div className="app">
-      <h1 className="app-title">Список задач</h1>
+    <ThemeContext.Provider value={theme}>
+      <div className={theme === "light" ? "app" : "app dark"}>
+        <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+          {theme === "light" ? "🌙 Тёмная" : "☀️ Светлая"}
+        </button>
+        <h1 className="app-title">Список задач</h1>
 
-      <TodoForm onAdd={handleAdd} />
+        <TodoForm onAdd={handleAdd} />
 
-      <TodoList
-        items={visibleItems}
-        onToggle={handleToggle}
-        onDelete={handleDelete}
-      />
+        <TodoList
+          items={visibleItems}
+          onToggle={handleToggle}
+          onDelete={handleDelete}
+        />
 
-      <FilterButtons filter={filter} onChange={setFilter} />
+        <FilterButtons filter={filter} onChange={setFilter} />
 
-      <p className="counter">Осталось: {remaining}</p>
+        <p className="counter">Осталось: {remaining}</p>
 
-      <button className="clear-btn" onClick={handleClear}>
-        Очистить всё
-      </button>
-    </div>
+        <button className="clear-btn" onClick={handleClear}>
+          Очистить всё
+        </button>
+      </div>
+    </ThemeContext.Provider>
   );
 }
 
