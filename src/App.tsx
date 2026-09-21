@@ -1,11 +1,11 @@
 import { useState, useEffect, useReducer } from "react";
 import "./App.css";
 import type { Todo, Filter, Action } from "./types";
-import TodoList from "./components/TodoList";
-import TodoForm from "./components/TodoForm";
-import FilterButtons from "./components/FilterButtons";
 import type { ThemeType } from "./theme.context";
 import { ThemeContext } from "./theme.context";
+import Home from "./pages/Home";
+import { NavLink, Route, Routes } from "react-router-dom";
+import About from "./pages/About";
 function reducer(state: Todo[], action: Action): Todo[] {
   switch (action.type) {
     case "add":
@@ -68,28 +68,30 @@ function App() {
 
   return (
     <ThemeContext.Provider value={theme}>
-      <div className={theme === "light" ? "app" : "app dark"}>
-        <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
-          {theme === "light" ? "🌙 Тёмная" : "☀️ Светлая"}
-        </button>
-        <h1 className="app-title">Список задач</h1>
-
-        <TodoForm onAdd={handleAdd} />
-
-        <TodoList
-          items={visibleItems}
-          onToggle={handleToggle}
-          onDelete={handleDelete}
+      <nav className="main-nav">
+        <NavLink to="/">Задачи</NavLink>
+        <NavLink to="/about">О проекте</NavLink>
+      </nav>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Home
+              onAdd={handleAdd}
+              onDelete={handleDelete}
+              onClear={handleClear}
+              onToggle={handleToggle}
+              items={visibleItems}
+              filter={filter}
+              remaining={remaining}
+              theme={theme}
+              setFilter={setFilter}
+              setTheme={setTheme}
+            ></Home>
+          }
         />
-
-        <FilterButtons filter={filter} onChange={setFilter} />
-
-        <p className="counter">Осталось: {remaining}</p>
-
-        <button className="clear-btn" onClick={handleClear}>
-          Очистить всё
-        </button>
-      </div>
+        <Route path="/about" element={<About theme={theme} />} />
+      </Routes>
     </ThemeContext.Provider>
   );
 }

@@ -23,7 +23,15 @@
 body {
   min-height: 100vh;
   font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
-  color: var(--text);
+  background: #fdf6f0;
+  color: #2b1a12;
+  overflow-x: hidden;
+  transition:
+    background 0.4s ease,
+    color 0.4s ease;
+}
+
+body:has(.app.dark) {
   background:
     radial-gradient(
       circle at 15% 20%,
@@ -33,7 +41,7 @@ body {
     radial-gradient(circle at 85% 80%, rgba(5, 217, 232, 0.3), transparent 45%),
     linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
   background-attachment: fixed;
-  overflow-x: hidden;
+  color: var(--text);
 }
 
 /* ===== Контейнер приложения ===== */
@@ -44,6 +52,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-height: 100vh;
 }
 
 /* ===== Заголовок ===== */
@@ -52,13 +61,20 @@ body {
   font-size: 2.2rem;
   font-weight: 800;
   letter-spacing: -0.02em;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  background: linear-gradient(90deg, #d97a4a, #8b3a62);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app.dark .app-title {
   background: linear-gradient(90deg, var(--neon-pink), var(--neon-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 10px;
   filter: drop-shadow(0 0 20px rgba(255, 42, 109, 0.5));
-  padding-bottom: 10px;
 }
 
 /* ===== Строка ввода ===== */
@@ -79,31 +95,43 @@ body {
   padding: 16px 22px;
   font-size: 1.05rem;
   font-family: inherit;
-  color: var(--text);
-  background: var(--glass);
-  border: 1.5px solid var(--glass-border);
+  color: #2b1a12;
+  background: #ffffff;
+  border: 1.5px solid #e8d5c8;
   border-radius: var(--radius);
   outline: none;
+  transition: all 0.3s ease;
+}
+
+.todo-input::placeholder {
+  color: #b79a8a;
+}
+
+.todo-input:focus {
+  border-color: #d97a4a;
+  box-shadow: 0 0 0 3px rgba(217, 122, 74, 0.15);
+}
+
+.app.dark .todo-input {
+  color: var(--text);
+  background: var(--glass);
+  border-color: var(--glass-border);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow:
     inset 0 0 20px rgba(255, 42, 109, 0.08),
     0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.todo-input::placeholder {
+.app.dark .todo-input::placeholder {
   color: var(--text-dim);
-  letter-spacing: 0.05em;
 }
 
-.todo-input:focus {
+.app.dark .todo-input:focus {
   border-color: var(--neon-cyan);
   box-shadow:
     0 0 0 3px rgba(5, 217, 232, 0.2),
-    0 0 30px rgba(5, 217, 232, 0.4),
-    inset 0 0 20px rgba(5, 217, 232, 0.1);
-  transform: translateY(-2px);
+    0 0 30px rgba(5, 217, 232, 0.4);
 }
 
 /* ===== Общие стили кнопок ===== */
@@ -119,44 +147,15 @@ body {
   border-radius: var(--radius);
   padding: 14px 28px;
   color: #fff;
-  background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-  box-shadow:
-    0 0 20px rgba(255, 42, 109, 0.4),
-    0 4px 15px rgba(0, 0, 0, 0.4);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(135deg, #d97a4a, #8b3a62);
+  transition: all 0.25s ease;
   white-space: nowrap;
-}
-
-.add-btn::before,
-.clear-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  transition: left 0.5s ease;
 }
 
 .add-btn:hover,
 .clear-btn:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow:
-    0 0 35px rgba(255, 42, 109, 0.7),
-    0 8px 25px rgba(0, 0, 0, 0.5);
-}
-
-.add-btn:hover::before,
-.clear-btn:hover::before {
-  left: 100%;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(217, 122, 74, 0.35);
 }
 
 .add-btn:active,
@@ -164,20 +163,39 @@ body {
   transform: translateY(0) scale(0.98);
 }
 
-/* ===== Кнопка "Очистить всё" — отдельный стиль ===== */
+/* ===== Кнопка "Очистить всё" ===== */
 .clear-btn {
-  background: linear-gradient(135deg, #2d1b4e, #1a0b2e);
+  background: transparent;
+  border: 1.5px solid #c14a5c;
+  color: #c14a5c;
+}
+
+.clear-btn:hover {
+  background: #c14a5c;
+  color: #fff;
+}
+
+/* ===== Тёмная тема для кнопок ===== */
+.app.dark .add-btn {
+  background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+  box-shadow: 0 0 20px rgba(255, 42, 109, 0.4);
+}
+
+.app.dark .add-btn:hover {
+  box-shadow: 0 0 35px rgba(255, 42, 109, 0.7);
+}
+
+.app.dark .clear-btn {
+  background: transparent;
   border: 1.5px solid var(--neon-cyan);
   color: var(--neon-cyan);
   box-shadow: 0 0 20px rgba(5, 217, 232, 0.3);
 }
 
-.clear-btn:hover {
+.app.dark .clear-btn:hover {
   background: var(--neon-cyan);
   color: #0a0018;
-  box-shadow:
-    0 0 30px rgba(5, 217, 232, 0.8),
-    0 0 60px rgba(5, 217, 232, 0.4);
+  box-shadow: 0 0 30px rgba(5, 217, 232, 0.8);
 }
 
 /* ===== Список задач ===== */
@@ -195,50 +213,62 @@ body {
   justify-content: space-between;
   padding: 18px 20px;
   font-size: 1.05rem;
-  background: var(--glass);
-  border: 1.5px solid var(--glass-border);
+  background: #ffffff;
+  border: 1.5px solid #e8d5c8;
   border-radius: var(--radius);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   cursor: pointer;
   word-break: break-word;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.3),
-    inset 0 0 15px rgba(211, 0, 197, 0.05);
-  animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transition: all 0.3s ease;
+  animation: slideIn 0.4s ease forwards;
 }
 
 .todo-item:hover {
-  transform: translateX(6px);
-  border-color: var(--neon-cyan);
-  box-shadow:
-    0 6px 30px rgba(5, 217, 232, 0.35),
-    inset 0 0 20px rgba(5, 217, 232, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
 .todo-item.completed {
+  background: #f4ede8;
+  color: #9a8577;
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+  text-decoration-color: #d97a4a;
+  text-decoration-thickness: 2px;
+}
+
+.todo-text {
+  flex: 1;
+}
+
+/* Тёмная тема для задач */
+.app.dark .todo-item {
+  color: var(--text);
+  background: var(--glass);
+  border-color: var(--glass-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 0 15px rgba(211, 0, 197, 0.05);
+}
+
+.app.dark .todo-item:hover {
+  transform: translateX(6px);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 6px 30px rgba(5, 217, 232, 0.35);
+}
+
+.app.dark .todo-item.completed {
   color: var(--text-dim);
   background: rgba(184, 255, 58, 0.05);
   border-color: rgba(184, 255, 58, 0.4);
   opacity: 0.75;
 }
 
-.todo-item.completed .todo-text {
-  text-decoration: line-through;
+.app.dark .todo-item.completed .todo-text {
   text-decoration-color: var(--neon-pink);
-  text-decoration-thickness: 2px;
-}
-
-.todo-item.completed:hover {
-  border-color: var(--neon-lime);
-  box-shadow:
-    0 6px 30px rgba(184, 255, 58, 0.35),
-    inset 0 0 20px rgba(184, 255, 58, 0.1);
-}
-
-.todo-text {
-  flex: 1;
 }
 
 /* ===== Кнопка удаления ===== */
@@ -247,24 +277,33 @@ body {
   font-size: 1.1rem;
   font-weight: 900;
   background: transparent;
-  color: var(--neon-pink);
-  border: 1.5px solid var(--neon-pink);
+  color: #c14a5c;
+  border: 1.5px solid #c14a5c;
   border-radius: 10px;
-  box-shadow: 0 0 12px rgba(255, 42, 109, 0.3);
   cursor: pointer;
   min-width: 40px;
   flex-shrink: 0;
   margin-left: 12px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s ease;
   font-family: inherit;
 }
 
 .delete-btn:hover {
+  background: #c14a5c;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.app.dark .delete-btn {
+  color: var(--neon-pink);
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 12px rgba(255, 42, 109, 0.3);
+}
+
+.app.dark .delete-btn:hover {
   background: var(--neon-pink);
   color: #fff;
-  box-shadow:
-    0 0 25px rgba(255, 42, 109, 0.9),
-    0 0 50px rgba(255, 42, 109, 0.5);
+  box-shadow: 0 0 25px rgba(255, 42, 109, 0.9);
   transform: scale(1.1) rotate(-5deg);
 }
 
@@ -272,9 +311,15 @@ body {
 .counter {
   font-size: 1rem;
   letter-spacing: 0.08em;
-  color: var(--text-dim);
+  color: #8b6f60;
   text-align: center;
   padding: 12px;
+  border-top: 1px dashed #e8d5c8;
+  border-bottom: 1px dashed #e8d5c8;
+}
+
+.app.dark .counter {
+  color: var(--text-dim);
   border-top: 1px dashed rgba(255, 42, 109, 0.3);
   border-bottom: 1px dashed rgba(5, 217, 232, 0.3);
 }
@@ -297,17 +342,22 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-1);
+  background: #f4ede8;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--neon-pink), var(--neon-purple));
+  background: linear-gradient(#d97a4a, #8b3a62);
   border-radius: 10px;
-  border: 2px solid var(--bg-1);
+  border: 2px solid #f4ede8;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(var(--neon-cyan), var(--neon-purple));
+body:has(.app.dark) ::-webkit-scrollbar-track {
+  background: var(--bg-1);
+}
+
+body:has(.app.dark) ::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--neon-pink), var(--neon-purple));
+  border-color: var(--bg-1);
 }
 
 /* ===== Адаптив ===== */
@@ -349,65 +399,46 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 10px 20px;
-  color: var(--text-dim);
-  background: var(--glass);
-  border: 1.5px solid var(--glass-border);
+  color: #8b6f60;
+  background: #ffffff;
+  border: 1.5px solid #e8d5c8;
   border-radius: var(--radius);
   cursor: pointer;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.filter-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.15),
-    transparent
-  );
-  transition: left 0.5s ease;
+  transition: all 0.25s ease;
 }
 
 .filter-btn:hover {
+  color: #2b1a12;
+  border-color: #d97a4a;
+  transform: translateY(-2px);
+}
+
+.filter-btn.active {
+  color: #fff;
+  background: linear-gradient(135deg, #d97a4a, #8b3a62);
+  border-color: transparent;
+}
+
+.app.dark .filter-btn {
+  color: var(--text-dim);
+  background: var(--glass);
+  border-color: var(--glass-border);
+  backdrop-filter: blur(12px);
+}
+
+.app.dark .filter-btn:hover {
   color: var(--text);
   border-color: var(--neon-cyan);
-  transform: translateY(-2px);
   box-shadow: 0 0 15px rgba(5, 217, 232, 0.3);
 }
 
-.filter-btn:hover::before {
-  left: 100%;
-}
-
-.filter-btn:active {
-  transform: translateY(0) scale(0.97);
-}
-
-/* ===== Активная кнопка фильтра ===== */
-.filter-btn.active {
+.app.dark .filter-btn.active {
   color: #0a0018;
   background: linear-gradient(135deg, var(--neon-cyan), var(--neon-lime));
-  box-shadow:
-    0 0 20px rgba(5, 217, 232, 0.6),
-    0 0 40px rgba(184, 255, 58, 0.3);
+  border-color: transparent;
+  box-shadow: 0 0 20px rgba(5, 217, 232, 0.6);
 }
 
-.filter-btn.active:hover {
-  box-shadow:
-    0 0 30px rgba(5, 217, 232, 0.9),
-    0 0 60px rgba(184, 255, 58, 0.5);
-}
-
-/* ===== Адаптив ===== */
 @media (max-width: 520px) {
   .filters {
     gap: 8px;
@@ -417,4 +448,139 @@ body {
     padding: 8px 14px;
     font-size: 0.75rem;
   }
+}
+
+/* ===== Страница About ===== */
+.about-section {
+  margin-bottom: 24px;
+}
+
+.about-heading {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+  color: #2b1a12;
+}
+
+.about-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.85;
+}
+
+.about-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.about-list li {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  background: #ffffff;
+  border: 1.5px solid #e8d5c8;
+}
+
+.app.dark .about-heading {
+  color: var(--text);
+}
+
+.app.dark .about-text {
+  color: #d0c2e8;
+}
+
+.app.dark .about-list li {
+  background: var(--glass);
+  border-color: var(--glass-border);
+  backdrop-filter: blur(12px);
+  color: var(--text);
+}
+
+/* ===== Навигация ===== */
+.main-nav {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  padding: 16px;
+}
+
+.main-nav a {
+  padding: 8px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  color: #8b6f60;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+
+.main-nav a:hover {
+  color: #d97a4a;
+}
+
+.main-nav a.active {
+  color: #fff;
+  background: linear-gradient(135deg, #d97a4a, #8b3a62);
+}
+
+body:has(.app.dark) .main-nav a {
+  color: #a893c7;
+}
+
+body:has(.app.dark) .main-nav a:hover {
+  color: var(--neon-cyan);
+}
+
+body:has(.app.dark) .main-nav a.active {
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-lime));
+  color: #0a0018;
+}
+
+/* ===== Кнопка переключения темы ===== */
+.theme-btn {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  background: transparent;
+  color: inherit;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition:
+    opacity 0.25s ease,
+    transform 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+.theme-btn:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.theme-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.app:not(.dark) .theme-btn:hover {
+  background: rgba(217, 122, 74, 0.08);
+  box-shadow: 0 4px 12px rgba(217, 122, 74, 0.2);
+}
+
+.app.dark .theme-btn:hover {
+  background: rgba(5, 217, 232, 0.08);
+  box-shadow: 0 0 15px rgba(5, 217, 232, 0.5);
 }
