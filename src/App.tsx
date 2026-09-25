@@ -6,6 +6,8 @@ import { ThemeContext } from "./theme.context";
 import Home from "./pages/Home";
 import { NavLink, Route, Routes } from "react-router-dom";
 import About from "./pages/About";
+import Stats from "./pages/Stats";
+import TaskDetail from "./pages/TaskDetail";
 function reducer(state: Todo[], action: Action): Todo[] {
   switch (action.type) {
     case "add":
@@ -71,6 +73,7 @@ function App() {
       <nav className="main-nav">
         <NavLink to="/">Задачи</NavLink>
         <NavLink to="/about">О проекте</NavLink>
+        <NavLink to="/stats">Статистика</NavLink>
       </nav>
       <Routes>
         <Route
@@ -91,6 +94,8 @@ function App() {
           }
         />
         <Route path="/about" element={<About theme={theme} />} />
+        <Route path="/stats" element={<Stats items={items} />}></Route>
+        <Route path="/task/:id" element={<TaskDetail items={items} />}></Route>
       </Routes>
     </ThemeContext.Provider>
   );
